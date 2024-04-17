@@ -4,8 +4,8 @@
     <div
       :class="{
         'text-base font-semibold px-[18px] py-[5px] border-[1px] border-solid leading-[20px] rounded-[8px]': true,
-        'border-white': status && price == 6000,
-        'border-red-500': status && price == 8500,
+        'border-white': status && price <= 6000,
+        'border-red-500': status && price > 6000,
         'text-gray-500 border-gray-500': !status
       }"
     >

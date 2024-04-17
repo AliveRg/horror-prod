@@ -1,5 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import questMixin from '@/mixins/questMixin.js'
+import axios from 'axios'
 </script>
 
 <template>
@@ -12,6 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
           class="w-[440px] h-[236px] font-montser font-medium leading-[80px] text-[64px] text-white"
         >
           THE
+
           <span class="text-red-500 font-black">BEST<br /></span>
           <p class="">QUEST</p>
           IN
@@ -34,10 +37,12 @@ import { RouterLink, RouterView } from 'vue-router'
         <p class="text-white text-[64px] font-black font-montser leading-[80px]">Квесты</p>
         <div class="grid grid-cols-2 px-[84px] pt-[36px] gap-[64px]">
           <div
-            v-for="(cuest, index) in cuests"
+            v-for="cuest in questData"
             :key="cuest.id"
             :class="
-              index % 2 === 0 ? 'flex items-center justify-end' : 'flex items-center justify-start'
+              cuest.id % 2 === 0
+                ? 'flex items-center justify-end'
+                : 'flex items-center justify-start'
             "
           >
             <div
@@ -45,7 +50,7 @@ import { RouterLink, RouterView } from 'vue-router'
             >
               <img
                 class="align-middle transition duration-300 ease-linear"
-                :src="cuest.imgUrl"
+                :src="'../src/assets/curs2.png'"
                 alt=""
               />
               <div
@@ -67,10 +72,10 @@ import { RouterLink, RouterView } from 'vue-router'
                         fill-opacity="0.9"
                       />
                     </svg>
-                    {{ cuest.peopleCount }}
+                    {{ cuest.players }}
                   </p>
                 </div>
-                <p class="text-[48px] text-center">{{ cuest.name }}</p>
+                <p class="text-[48px] text-center">{{ cuest.quest_name }}</p>
                 <div class="btn flex items-center justify-center">
                   <RouterLink
                     :to="{ name: 'about', params: { id: cuest.id } }"
@@ -119,6 +124,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <script>
 export default {
+  mixins: [questMixin],
   data() {
     return {
       cuests: [

@@ -1,7 +1,8 @@
 <script setup>
 import iconPrice from '../components/icon/iconPrice.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-
+import questMixin from '@/mixins/questMixin.js'
+import axios from 'axios'
 // Import Swiper styles
 import 'swiper/css'
 </script>
@@ -17,11 +18,11 @@ import 'swiper/css'
               class="flex gap-[16px] text-white text-opacity-90 text-xl font-normal font-montser pt-[24px]"
             >
               <p
-                v-for="(tag, index) in tags"
-                :key="index"
+                v-for="tag in questDataOnly.tags"
+                :key="tag.id"
                 class="px-[16px] py-[4px] border-solid border-[1px] border-white/60 rounded-[16px]"
               >
-                {{ tag }}
+                {{ tag.name }}
               </p>
             </div>
           </div>
@@ -57,35 +58,35 @@ import 'swiper/css'
             class="flex flex-col gap-[24px] max-w-[100px] font-semibold font-montser text-[16px] text-[#5F5F5F] text-center justify-center"
           >
             <p>Игроков</p>
-            <p class="text-white">1-8 человек</p>
+            <p class="text-white">{{ questDataOnly.players }} - {{ questDataOnly.players * 2 }}</p>
           </div>
           <div class="border-r-[1px] bordre-white border-solid h-[100px] w-0"></div>
           <div
             class="flex flex-col gap-[24px] max-w-[100px] font-semibold font-montser text-[16px] text-[#5F5F5F] text-center justify-center"
           >
             <p>Время</p>
-            <p class="text-white">60 минут</p>
+            <p class="text-white">{{ questDataOnly.time }} минут</p>
           </div>
           <div class="border-r-[1px] bordre-white border-solid h-[100px] w-0"></div>
           <div
             class="flex flex-col gap-[24px] max-w-[100px] font-semibold font-montser text-[16px] text-[#5F5F5F] text-center justify-center"
           >
             <p>Цена</p>
-            <p class="text-white">от 6 000 р</p>
+            <p class="text-white">от {{ questDataOnly.price }} р</p>
           </div>
           <div class="border-r-[1px] bordre-white border-solid h-[100px] w-0"></div>
           <div
             class="flex flex-col gap-[24px] max-w-[100px] font-semibold font-montser text-[16px] text-[#5F5F5F] text-center justify-center"
           >
             <p>Сложность</p>
-            <p class="text-white">Средний</p>
+            <p class="text-white">{{ questDataOnly.level }}</p>
           </div>
           <div class="border-r-[1px] bordre-white border-solid h-[100px] w-0"></div>
           <div
             class="flex flex-col gap-[24px] max-w-[100px] font-semibold font-montser text-[16px] text-[#5F5F5F] text-center justify-center"
           >
             <p>Возраст</p>
-            <p class="text-white">18+</p>
+            <p class="text-white">{{ questDataOnly.age }}+</p>
           </div>
         </div>
         <p
@@ -99,20 +100,7 @@ import 'swiper/css'
       <div class="px-[64px] pt-[42px] font-montser text-white">
         <p class="text-[64px] font-black">О квесте</p>
         <p class="pt-[24px] text-[24px]">
-          Писатель Эллисон Освальт, зарабатывающий на жизнь написанием криминальных романов и
-          детективов по мотивам реальных событий и преступлений, переезжает с семьёй в новый дом,
-          где почти год назад развернулась леденящая душу трагедия — была убита семя Стивенсонов,
-          кроме одной девочки…Стефани – она чудесным образом, пропала. Делом в городе никто не
-          занимался. Писатель случайно находит видеозаписи, которые являются ключом к тайне
-          преступления и решает посвятить новую книгу расследованию убийству целой семьи, членов
-          которых повесили на дереве. Но ничто не дается даром: в доме начинают происходить жуткие
-          вещи. Они столкнулись с чем-то, от чего нет спасения… Эшли – дочь известного писателя - в
-          руках она держит старинную камеру, которой снимает все происходящее, и топор. Девочка
-          обещала отцу, что сделает его знаменитым. Надежда найти пропавших не покидала лишь лучшего
-          друга писателя. К счастью, вы отозвались на его многочисленные просьбы о помощи. Однако
-          вам самим придется полностью прожить случившееся с пропавшей семьей, от начала и до конца.
-          Проклятый проектор дожидается своего нового владельца. Надеемся, что среди плёнок не
-          появится новая запись - «Домашнего рисования».
+          {{ questDataOnly.descr }}
         </p>
       </div>
     </section>
@@ -150,7 +138,7 @@ import 'swiper/css'
             </h2>
             <ul class="flex flex-wrap gap-[16px]">
               <li v-for="time in getTimes(dataItem.timeStart, dataItem.timeEnd)" :key="time">
-                <iconPrice :time="time" price="8500" :status="false" />
+                <iconPrice :time="time" price="5500" :status="true" />
               </li>
             </ul>
           </div>
@@ -163,9 +151,12 @@ import 'swiper/css'
 
 <script>
 export default {
+  mixins: [questMixin],
+  questDataOnly: '',
   data() {
     return {
-      tags: ['страшные', 'популярные', 'хоррор'],
+      getRout: this.$route.params.id,
+      questDataOnly: '',
       images: ['../src/assets/image1.png', '../src/assets/image2.png', '../src/assets/image3.png'],
       datas: [
         {
@@ -212,6 +203,27 @@ export default {
       ]
     }
   },
+  mounted() {
+    let data = ''
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `http://127.0.0.1:8000/api/getQuest/${this.getRout}`,
+      headers: {},
+      data: data
+    }
+
+    axios
+      .request(config)
+      .then((response) => {
+        this.questDataOnly = response.data[0]
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+  computed: {},
   methods: {
     getTimes(start, end) {
       const times = []
