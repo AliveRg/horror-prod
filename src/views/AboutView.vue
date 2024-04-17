@@ -1,4 +1,5 @@
 <script setup>
+import iconPrice from '../components/icon/iconPrice.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 
 // Import Swiper styles
@@ -115,12 +116,46 @@ import 'swiper/css'
         </p>
       </div>
     </section>
-    <section>
+    <section class="bg-[#202020]">
       <div class="pt-[36px] px-[64px]">
-        <p class="text-[64px] font-black font-montser text-white leading-[72px]">
-          Онлайн <br />
-          бронирование
+        <div class="">
+          <p class="text-[64px] font-black font-montser text-white leading-[72px]">
+            Онлайн <br />
+            бронирование
+          </p>
+        </div>
+        <div class="pt-[42px] pb-[32px]">
+          <div
+            class="flex items-center justify-start gap-[16px] text-white text-xl font-semibold font-['Montserrat'] leading-9"
+          >
+            <div class="w-36 text-white text-2xl font-semibold font-['Montserrat'] leading-10">
+              Стоимость:
+            </div>
+            <div class="w-24 rounded-lg border-2 border-white">
+              <p class="text-center">6000</p>
+            </div>
+            <div class="w-24 rounded-lg border-2 border-red-500">
+              <p class="text-center">8500</p>
+            </div>
+          </div>
+        </div>
+        <p class="text-white text-xl font-semibold font-['Montserrat'] leading-9">
+          Цена указана за команду до 4-х игроков, доп игрок 1000р
         </p>
+        <div class="my-[22px] border-b-white border-solid border-b-[1px]"></div>
+        <div v-for="dataItem in datas" :key="dataItem.data" class="">
+          <div class="flex">
+            <h2 class="text-white text-[20px] font-semibold font-montser min-w-fit mr-[56px]">
+              {{ dataItem.data }}
+            </h2>
+            <ul class="flex flex-wrap gap-[16px]">
+              <li v-for="time in getTimes(dataItem.timeStart, dataItem.timeEnd)" :key="time">
+                <iconPrice :time="time" price="8500" :status="false" />
+              </li>
+            </ul>
+          </div>
+          <div class="pb-[22px] mt-[22px] border-t-white border-solid border-t-[1px]"></div>
+        </div>
       </div>
     </section>
   </div>
@@ -131,7 +166,62 @@ export default {
   data() {
     return {
       tags: ['страшные', 'популярные', 'хоррор'],
-      images: ['../src/assets/image1.png', '../src/assets/image2.png', '../src/assets/image3.png']
+      images: ['../src/assets/image1.png', '../src/assets/image2.png', '../src/assets/image3.png'],
+      datas: [
+        {
+          data: 'пн, 1 апреля',
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'вт, 2 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'ср, 3 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'чт, 4 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'пт, 5 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'сб, 6 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        },
+        {
+          data: 'вс, 7 апреля',
+
+          timeStart: '10:30',
+          timeEnd: '21:30'
+        }
+      ]
+    }
+  },
+  methods: {
+    getTimes(start, end) {
+      const times = []
+      let currentTime = new Date(`2000-01-01T${start}`)
+      const endTime = new Date(`2000-01-01T${end}`)
+      while (currentTime <= endTime) {
+        times.push(currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }))
+        currentTime = new Date(currentTime.getTime() + 60 * 60000) // добавляем час
+      }
+      return times
     }
   },
   components: {

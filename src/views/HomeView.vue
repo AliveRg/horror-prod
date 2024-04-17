@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import { RouterLink, RouterView } from 'vue-router'
+</script>
 
 <template>
   <main class="bg-[#202020] pt-[18px]">
@@ -70,14 +72,44 @@
                 </div>
                 <p class="text-[48px] text-center">{{ cuest.name }}</p>
                 <div class="btn flex items-center justify-center">
-                  <p
+                  <RouterLink
+                    :to="{ name: 'about', params: { id: cuest.id } }"
                     class="px-[60px] pt-[19px] pb-[20px] bg-white/10 hover:bg-white/20 rounded-[16px] text-[32px] border-solid border-[1px] border-white/60"
                   >
                     перейти
-                  </p>
+                  </RouterLink>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div class="container-se px-[64px]">
+        <p class="text-white text-[64px] font-black font-montser leading-[80px] pb-[36px]">О нас</p>
+        <div class="flex items-center justify-between gap-[36px] pb-[42px]">
+          <div class="max-w-[460px] w-full">
+            <img class="w-full" src="@/assets/aboutimg2.png" alt="" />
+          </div>
+          <p
+            class="w-2/3 max-w-[600px] font-[600] text-[26px] text-white leading-[36px] font-montser"
+          >
+            Наша команда, специализирующаяся на создании самых ужасных и захватывающих квестов для
+            любителей адреналина и приключений. Мы предлагаем уникальные сценарии, включающие в себя
+            заброшенные психиатрические госпитали, дома с проклятиями и загадочные лабиринты
+            времени.
+          </p>
+        </div>
+        <div class="flex items-center justify-between gap-[36px]">
+          <p
+            class="w-2/3 max-w-[600px] font-[600] text-right text-[26px] text-white leading-[36px] font-montser"
+          >
+            HOOLIGAN QUEST - это место, где смелые и отважные могут испытать настоящий ужас и пройти
+            через испытание, которое они никогда не забудут.
+          </p>
+          <div class="max-w-[460px] w-full">
+            <img class="w-full" src="@/assets/aboutimg1.png" alt="" />
           </div>
         </div>
       </div>
