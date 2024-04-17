@@ -131,15 +131,16 @@ import 'swiper/css'
           Цена указана за команду до 4-х игроков, доп игрок 1000р
         </p>
         <div class="my-[22px] border-b-white border-solid border-b-[1px]"></div>
+        {{ getTimes() }}
         <div v-for="dataItem in datas" :key="dataItem.data" class="">
           <div class="flex">
             <h2 class="text-white text-[20px] font-semibold font-montser min-w-fit mr-[56px]">
               {{ dataItem.data }}
             </h2>
             <ul class="flex flex-wrap gap-[16px]">
-              <li v-for="time in getTimes(dataItem.timeStart, dataItem.timeEnd)" :key="time">
+              <!-- <li v-for="time in " :key="time">
                 <iconPrice :time="time" price="5500" :status="true" />
-              </li>
+              </li> -->
             </ul>
           </div>
           <div class="pb-[22px] mt-[22px] border-t-white border-solid border-t-[1px]"></div>
@@ -225,15 +226,76 @@ export default {
   },
   computed: {},
   methods: {
-    getTimes(start, end) {
-      const times = []
-      let currentTime = new Date(`2000-01-01T${start}`)
-      const endTime = new Date(`2000-01-01T${end}`)
-      while (currentTime <= endTime) {
-        times.push(currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }))
-        currentTime = new Date(currentTime.getTime() + 60 * 60000) // добавляем час
+    getTimes() {
+      const daysOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+      const months = [
+        'янв',
+        'фев',
+        'мар',
+        'апр',
+        'май',
+        'июн',
+        'июл',
+        'авг',
+        'сен',
+        'окт',
+        'ноя',
+        'дек'
+      ]
+      const currentDate = new Date() // текущая дата и время
+      const futureWeek = []
+
+      // Проходимся по 7 дням вперед
+      for (let i = 0; i < 7; i++) {
+        const futureDate = new Date(currentDate.getTime() + i * 24 * 60 * 60 * 1000) // прибавляем день
+        const dayOfWeek = daysOfWeek[futureDate.getDay()] // получаем день недели
+        const month = months[futureDate.getMonth()] // получаем месяц
+        const formattedDate = futureDate.toLocaleDateString('ru-RU', { day: 'numeric' }) // форматируем дату без года
+
+        // Генерируем время только в диапазоне от 10:30 до 21:30 для каждого дня
+        const times = []
+        let currentTime = new Date(
+          futureDate.getFullYear(),
+          futureDate.getMonth(),
+          futureDate.getDate(),
+          10,
+          30,
+          0
+        )
+        if (i === 0) {
+          // Если сегодня, учитываем текущее время
+          const currentHour = currentDate.getHours()
+          const currentMinute = currentDate.getMinutes()
+          const currentMinutes = currentHour * 60 + currentMinute
+          const firstTimeMinutes = 10 * 60 + 30 // 10:30 в минутах
+          if (currentMinutes < firstTimeMinutes) {
+            currentTime = currentDate // Начинаем с текущего времени, если еще не 10:30
+          }
+        }
+        const endTime = new Date(
+          futureDate.getFullYear(),
+          futureDate.getMonth(),
+          futureDate.getDate(),
+          21,
+          30,
+          0
+        )
+        while (currentTime <= endTime) {
+          times.push(
+            currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+          )
+          currentTime = new Date(currentTime.getTime() + 30 * 60000) // добавляем 30 минут
+        }
+
+        futureWeek.push({
+          dayOfWeek: dayOfWeek,
+          date: formattedDate,
+          month: month,
+          times: times
+        })
       }
-      return times
+
+      console.log(futureWeek)
     }
   },
   components: {
