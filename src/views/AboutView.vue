@@ -131,16 +131,15 @@ import 'swiper/css'
           Цена указана за команду до 4-х игроков, доп игрок 1000р
         </p>
         <div class="my-[22px] border-b-white border-solid border-b-[1px]"></div>
-        {{ getTimes() }}
-        <div v-for="dataItem in datas" :key="dataItem.data" class="">
+        <div v-for="(dataItem, index) in getTimes()" :key="index" class="">
           <div class="flex">
             <h2 class="text-white text-[20px] font-semibold font-montser min-w-fit mr-[56px]">
-              {{ dataItem.data }}
+              {{ dataItem.dayOfWeek }} {{ dataItem.date }} {{ dataItem.month }}
             </h2>
             <ul class="flex flex-wrap gap-[16px]">
-              <!-- <li v-for="time in " :key="time">
-                <iconPrice :time="time" price="5500" :status="true" />
-              </li> -->
+              <li v-for="(time, index) in dataItem.times" :key="index">
+                <iconPrice :time="time.time" :price="time.price" :bron="time.bron" />
+              </li>
             </ul>
           </div>
           <div class="pb-[22px] mt-[22px] border-t-white border-solid border-t-[1px]"></div>
@@ -201,10 +200,20 @@ export default {
           timeStart: '10:30',
           timeEnd: '21:30'
         }
-      ]
+      ],
+      bookings: []
     }
   },
   mounted() {
+    let order = axios.post('http://127.0.0.1:8000/api/getOrders')
+
+    order
+      .then((response) => {
+        this.bookings = response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     let data = ''
 
     let config = {
@@ -268,9 +277,9 @@ export default {
           const currentMinute = currentDate.getMinutes()
           const currentMinutes = currentHour * 60 + currentMinute
           const firstTimeMinutes = 10 * 60 + 30 // 10:30 в минутах
-          if (currentMinutes < firstTimeMinutes) {
-            currentTime = currentDate // Начинаем с текущего времени, если еще не 10:30
-          }
+          // if (currentMinutes < firstTimeMinutes) {
+          //   currentTime = currentDate // Начинаем с текущего времени, если еще не 10:30
+          // }
         }
         const endTime = new Date(
           futureDate.getFullYear(),
@@ -281,12 +290,26 @@ export default {
           0
         )
         while (currentTime <= endTime) {
-          times.push(
-            currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-          )
-          currentTime = new Date(currentTime.getTime() + 30 * 60000) // добавляем 30 минут
+          times.push({
+            time: currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+            price: 6000,
+            bron: 1
+          })
+          currentTime = new Date(currentTime.getTime() + 60 * 60000) // добавляем 60 минут
         }
-
+        times.forEach((timeSlot) => {
+          this.bookings.forEach((bookingItem) => {
+            const bookingDateTime = new Date(bookingItem.booking_date)
+            if (
+              bookingDateTime.getDate() === futureDate.getDate() &&
+              bookingDateTime.getMonth() === futureDate.getMonth() &&
+              bookingDateTime.getFullYear() === futureDate.getFullYear() &&
+              bookingItem.booking_date.includes(timeSlot.time)
+            ) {
+              timeSlot.bron = 0
+            }
+          })
+        })
         futureWeek.push({
           dayOfWeek: dayOfWeek,
           date: formattedDate,
@@ -295,7 +318,7 @@ export default {
         })
       }
 
-      console.log(futureWeek)
+      return futureWeek
     }
   },
   components: {
