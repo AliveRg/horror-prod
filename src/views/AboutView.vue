@@ -1,5 +1,6 @@
 <script setup>
 import iconPrice from '../components/icon/iconPrice.vue'
+import openWindow from '../components/openWindow.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import questMixin from '@/mixins/questMixin.js'
 import axios from 'axios'
@@ -13,7 +14,7 @@ import 'swiper/css'
         <div class="flex justify-between items-end">
           <div class="font-montser leading-[80px]">
             <p class="text-white text-2xl font-semibold">Квест-перфоманс</p>
-            <p class="text-red-500 text-[64px] font-bold">Синистер</p>
+            <p class="text-red-500 text-[64px] font-bold">{{ questDataOnly.quest_name }}</p>
             <div
               class="flex gap-[16px] text-white text-opacity-90 text-xl font-normal font-montser pt-[24px]"
             >
@@ -138,7 +139,14 @@ import 'swiper/css'
             </h2>
             <ul class="flex flex-wrap gap-[16px]">
               <li v-for="(time, index) in dataItem.times" :key="index">
-                <iconPrice :time="time.time" :price="time.price" :bron="time.bron" />
+                <iconPrice
+                  :time="time.time"
+                  :price="time.price"
+                  :bron="time.bron"
+                  :questName="questDataOnly.quest_name"
+                  :date="dataItem.date"
+                  :month="dataItem.month"
+                />
               </li>
             </ul>
           </div>
@@ -152,7 +160,7 @@ import 'swiper/css'
 <script>
 export default {
   mixins: [questMixin],
-  questDataOnly: '',
+
   data() {
     return {
       getRout: this.$route.params.id,
@@ -205,15 +213,6 @@ export default {
     }
   },
   mounted() {
-    let order = axios.post('http://127.0.0.1:8000/api/getOrders')
-
-    order
-      .then((response) => {
-        this.bookings = response.data
-      })
-      .catch((error) => {
-        console.log(error)
-      })
     let data = ''
 
     let config = {
@@ -226,8 +225,21 @@ export default {
 
     axios
       .request(config)
-      .then((response) => {
-        this.questDataOnly = response.data[0]
+      .then((responsees) => {
+        this.questDataOnly = responsees.data[0]
+
+        let order = axios.post('http://127.0.0.1:8000/api/getOrders')
+
+        order
+          .then((response) => {
+            console.log(response.data)
+            this.bookings = response.data.filter(
+              (item) => item.quest_name == responsees.data[0].quest_name
+            )
+          })
+          .catch((error) => {
+            console.log(error)
+          })
       })
       .catch((error) => {
         console.log(error)
@@ -323,7 +335,8 @@ export default {
   },
   components: {
     Swiper,
-    SwiperSlide
+    SwiperSlide,
+    openWindow
   },
   setup() {
     const onSwiper = (swiper) => {

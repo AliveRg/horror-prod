@@ -21,7 +21,6 @@ export default {
       .request(config)
       .then((response) => {
         this.questData = response.data
-        console.log(response.data)
       })
       .catch((error) => {
         console.log(error)
